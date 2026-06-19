@@ -39,7 +39,6 @@ const rtRumahInput = document.getElementById("rtRumah");
 const rwRumahInput = document.getElementById("rwRumah"); 
 const btnSimpan = document.getElementById("btnSimpan");
 const tabelBodi = document.getElementById("tabelBodi");
-const inputCari = document.getElementById("inputCari");
 
 let semuaData = [];
 let dataTableInstance = null; // Menyimpan instance jalannya DataTables
@@ -99,7 +98,7 @@ onSnapshot(q, (snapshot) => {
 });
 
 // ==========================================
-// FITUR 3: TAMPILKAN DATA KE TABEL + AUTOMATIC ALL COLUMN SORT
+// FITUR 3: TAMPILKAN DATA KE TABEL + DATA TABLES
 // ==========================================
 function tampilkanData(daftarData) {
     // Hancurkan DataTables lama jika ada, agar tidak duplikat saat data di-render ulang
@@ -140,33 +139,32 @@ function tampilkanData(daftarData) {
         tabelBodi.appendChild(baris);
     });
 
-    // Jalankan Fitur Sortir Semua Kolom Otomatis menggunakan DataTables Library
+    // Jalankan Fitur Menggunakan DataTables Library
     dataTableInstance = $('#tabelWarga').DataTable({
-        "paging": true,      // Mengaktifkan halaman (1 2 3) jika data terlalu banyak
-        "ordering": true,    // MENGAKTIFKAN FITUR SORT DI SEMUA KOLOM SECARA OTOMATIS
-        "info": true,        // Menampilkan info jumlah data
-        "searching": true,   // Menghidupkan filter pencarian internal
+        "paging": true,      
+        "ordering": true,    
+        "info": true,        
+        "searching": true,   
+        "responsive": true,  
         "columnDefs": [
-            { "orderable": false, "targets": 6 } // Mematikan fitur sortir khusus untuk kolom "Aksi" (index ke-6)
+            { "orderable": false, "targets": 6 } // Mematikan fitur sortir khusus untuk kolom "Aksi"
         ]
     });
 
-    // Event Listener Tombol Edit
-    const tombolEdit = document.querySelectorAll(".btn-edit");
-    tombolEdit.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            const idSelected = e.target.getAttribute("data-id");
-            isiFormUntukEdit(idSelected);
-        });
+    // ==========================================================
+    // FIX: EVENT DELEGATION AGAR TOMBOL WORK DI HP DAN DATATABLES
+    // ==========================================================
+    
+    // Event Klik untuk Tombol Edit
+    $('#tabelWarga').off('click', '.btn-edit').on('click', '.btn-edit', function() {
+        const idSelected = $(this).attr('data-id');
+        isiFormUntukEdit(idSelected);
     });
 
-    // Event Listener Tombol Hapus
-    const tombolHapus = document.querySelectorAll(".btn-delete");
-    tombolHapus.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            const idSelected = e.target.getAttribute("data-id");
-            hapusDataWarga(idSelected);
-        });
+    // Event Klik untuk Tombol Hapus
+    $('#tabelWarga').off('click', '.btn-delete').on('click', '.btn-delete', function() {
+        const idSelected = $(this).attr('data-id');
+        hapusDataWarga(idSelected);
     });
 }
 
@@ -229,16 +227,3 @@ async function hapusDataWarga(id) {
         }
     }
 }
-
-
-// Jalankan Fitur Sortir Semua Kolom Otomatis menggunakan DataTables Library
-    dataTableInstance = $('#tabelWarga').DataTable({
-        "paging": true,      
-        "ordering": true,    
-        "info": true,        
-        "searching": true,   
-        "responsive": true,  // <--- TAMBAHKAN BARIS INI AGAR RAPI DI HP
-        "columnDefs": [
-            { "orderable": false, "targets": 6 } 
-        ]
-    });
