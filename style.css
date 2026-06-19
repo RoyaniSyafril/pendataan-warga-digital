@@ -146,36 +146,45 @@ tr:hover {
 }
 
 /* ==========================================
-   PENGATURAN SCROLL HORIZONTAL TOTAL DI HP
+   PENGATURAN RESPONSIVE TABEL HP (TANPA UBAH HTML)
    ========================================== */
 @media screen and (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 10px; /* Memaksimalkan space layar HP */
     }
 
     .card {
-        padding: 15px;
-        overflow: hidden; /* Mencegah card meluber keluar layar HP */
+        padding: 12px; /* Mempersempit padding card di HP */
     }
 
-    /* Memaksa pembungkus DataTables agar bisa di-scroll dengan mulus di sela jari */
-    .dataTables_wrapper {
+    /* Paksa kontainer tabel agar tidak meluber keluar dari card */
+    .table-container {
         width: 100% !important;
         overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch; /* Membuat scroll di iPhone/Safari jadi smooth */
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* Ukuran text yang proporsional untuk tabel scroll di HP */
-    table.dataTable tbody td,
+    /* PENTING: Mempersempit dan melipat teks Judul (thead) & Kaki (tfoot) yang panjang */
     table.dataTable thead th,
     table.dataTable tfoot th {
-        font-size: 13px !important;
-        padding: 10px 8px !important; /* Memberikan space ketukan jari yang pas */
+        font-size: 11px !important;       /* Perkecil ukuran font khusus judul di HP */
+        padding: 8px 4px !important;      /* Persempit jarak antar kolom */
+        white-space: normal !important;   /* PAKSA TEKS MELIPAT KE BAWAH jika terlalu panjang */
+        word-break: break-word !important;/* Potong kata jika benar-benar sempit */
+        line-height: 1.2 !important;      /* Rapatkan jarak antar baris teks judul */
+        vertical-align: middle !important;
     }
 
-    /* Tombol aksi dibuat sejajar kesamping */
+    /* Ukuran text dan padding untuk isi data tabel (tbody) */
+    table.dataTable tbody td {
+        font-size: 12px !important;
+        padding: 8px 4px !important;
+        white-space: normal !important;
+    }
+
+    /* Rapikan tombol aksi agar tetap proporsional */
     .btn-edit, .btn-delete {
-        padding: 5px 10px !important;
+        padding: 4px 6px !important;
         font-size: 11px !important;
         display: inline-block;
     }

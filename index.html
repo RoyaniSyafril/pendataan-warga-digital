@@ -24,12 +24,12 @@
 
                 <div class="form-group">
                     <label for="noBangunan">Nomor Urut Bangunan:</label>
-                    <input type="text" id="noBangunan" inputmode="numeric" pattern="[0-9]*" placeholder="Contoh: B-01 atau 001" required>
+                    <input type="text" id="noBangunan" inputmode="numeric" pattern="[0-9]*" placeholder="Contoh: 001" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="noKeluarga">Nomor Urut Keluarga:</label>
-                    <input type="text" id="noKeluarga" inputmode="numeric" pattern="[0-9]*" placeholder="Contoh: K-01 atau 001" required>
+                    <input type="text" id="noKeluarga" inputmode="numeric" pattern="[0-9]*" placeholder="Contoh: 001" required>
                 </div>
                 
                 <div class="form-group">
@@ -65,8 +65,8 @@
 <table id="tabelWarga" class="display nowrap" style="width:100%">
             <thead>
             <tr>
-                <th>No. Bangunan</th>
-                <th>No. Keluarga</th>
+                <th>No. Urut Bangunan</th>
+                <th>No. Urut Keluarga</th>
                 <th>Nama</th>
                 <th>Alamat Utama</th>
                 <th style="text-align: center;">RT</th>
@@ -77,14 +77,14 @@
         <tbody id="tabelBodi">
             </tbody>
         <tfoot>
-            <tr>
-                <th>No. Bangunan</th>
-                <th>No. Keluarga</th>
+             <tr>
+                <th>No. Urut Bangunan</th>
+                <th>No. Urut Keluarga</th>
                 <th>Nama</th>
                 <th>Alamat Utama</th>
                 <th style="text-align: center;">RT</th>
                 <th style="text-align: center;">RW</th>
-                <th>Aksi</th>
+                <th class="no-sort">Aksi</th>
             </tr>
         </tfoot>
     </table>
