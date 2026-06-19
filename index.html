@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Pendataan Warga & Bangunan</title>
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <style>
+        /* Sedikit kustomisasi agar serasi dengan style.css milikmu */
+        .dataTables_wrapper { margin-top: 15px; }
+        .dataTables_filter { margin-bottom: 15px; }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -53,13 +60,9 @@
             </form>
         </div>
 
-        <div class="search-bar">
-            <input type="text" id="inputCari" placeholder="Cari berdasarkan nama atau nomor urut...">
-        </div>
-
         <div class="card table-container">
             <h2>Daftar Urutan Data</h2>
-            <table>
+            <table id="tabelWarga" class="display" style="width:100%">
                 <thead>
                     <tr>
                         <th>No. Bangunan</th>
@@ -68,18 +71,17 @@
                         <th>Alamat Utama</th>
                         <th>RT</th>
                         <th>RW</th>
-                        <th>Aksi</th>
-                    </tr>
+                        <th class="no-sort">Aksi</th> </tr>
                 </thead>
                 <tbody id="tabelBodi">
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #888;">Belum ada data atau sedang memuat...</td>
-                    </tr>
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    
     <script src="app.js" type="module"></script>
 </body>
 </html>
