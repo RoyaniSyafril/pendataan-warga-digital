@@ -229,3 +229,16 @@ async function hapusDataWarga(id) {
         }
     }
 }
+
+
+// Jalankan Fitur Sortir Semua Kolom Otomatis menggunakan DataTables Library
+    dataTableInstance = $('#tabelWarga').DataTable({
+        "paging": true,      
+        "ordering": true,    
+        "info": true,        
+        "searching": true,   
+        "responsive": true,  // <--- TAMBAHKAN BARIS INI AGAR RAPI DI HP
+        "columnDefs": [
+            { "orderable": false, "targets": 6 } 
+        ]
+    });
