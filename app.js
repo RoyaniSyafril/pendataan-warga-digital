@@ -40,15 +40,17 @@ const rwRumahInput = document.getElementById("rwRumah");
 const btnSimpan = document.getElementById("btnSimpan");
 
 let semuaData = [];
-// Langsung inisialisasi DataTables 1 kali saja di awal biar tidak destroy-bikin ulang terus
+// Langsung inisialisasi DataTables dengan fitur Scroll Horizontal
 let dataTableInstance = $('#tabelWarga').DataTable({
     "paging": true,      
     "ordering": true,    
     "info": true,        
     "searching": true,   
-    "responsive": true,  
+    "scrollX": true,      // <--- UTAMA: Hidupkan scroll horizontal agar semua isi terlihat
+    "responsive": false,  // <--- UTAMA: Matikan fitur sembunyikan kolom (plus +)
     "columnDefs": [
-        { "orderable": false, "targets": 6 }
+        { "orderable": false, "targets": 6 }, // Matikan sortir kolom aksi
+        { "width": "120px", "targets": 3 }    // Batasi lebar kolom alamat utama agar tidak terlalu panjang
     ]
 });
 

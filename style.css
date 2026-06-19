@@ -146,42 +146,37 @@ tr:hover {
 }
 
 /* ==========================================
-   PENGATURAN RESPONSIVE TABEL KHUSUS HP
+   PENGATURAN SCROLL HORIZONTAL TOTAL DI HP
    ========================================== */
 @media screen and (max-width: 768px) {
-    /* 1. Perkecil ukuran text di dalam tabel agar muat banyak */
-    table.dataTable tbody th, 
+    body {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 15px;
+        overflow: hidden; /* Mencegah card meluber keluar layar HP */
+    }
+
+    /* Memaksa pembungkus DataTables agar bisa di-scroll dengan mulus di sela jari */
+    .dataTables_wrapper {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch; /* Membuat scroll di iPhone/Safari jadi smooth */
+    }
+
+    /* Ukuran text yang proporsional untuk tabel scroll di HP */
     table.dataTable tbody td,
-    table.dataTable thead th {
-        font-size: 12px !important;
-        padding: 8px 4px !important; /* Mempersempit jarak atas-bawah & kiri-kanan */
+    table.dataTable thead th,
+    table.dataTable tfoot th {
+        font-size: 13px !important;
+        padding: 10px 8px !important; /* Memberikan space ketukan jari yang pas */
     }
 
-    /* 2. Rapikan tombol Edit dan Hapus di HP agar tidak numpuk */
+    /* Tombol aksi dibuat sejajar kesamping */
     .btn-edit, .btn-delete {
-        padding: 4px 6px !important;
+        padding: 5px 10px !important;
         font-size: 11px !important;
-    }
-
-    /* 3. Atur kotak pencarian DataTables agar pas di layar HP */
-    .dataTables_wrapper .dataTables_filter {
-        float: none !important;
-        text-align: left !important;
-        margin-bottom: 10px;
-    }
-    
-    .dataTables_wrapper .dataTables_filter input {
-        width: 100% !important; /* Kotak search penuh ke kanan di HP */
-        margin-left: 0 !important;
-        margin-top: 5px;
-    }
-
-    /* 4. Atur info jumlah data dan tombol halaman (pagination) agar rapi */
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_paginate {
-        float: none !important;
-        text-align: center !important;
-        font-size: 12px;
-        margin-top: 10px;
+        display: inline-block;
     }
 }
