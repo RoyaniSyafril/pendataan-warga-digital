@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pendataan Warga & Bangunan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Aplikasi Pendataan Warga & Bangunan</h1>
+        
+        <div class="card">
+            <h2>Tambah Data Baru</h2>
+            <form id="dataForm">
+                <input type="hidden" id="dataId">
+
+                <div class="form-group">
+                    <label for="noBangunan">Nomor Urut Bangunan:</label>
+                    <input type="text" id="noBangunan" placeholder="Contoh: B-01 atau 001" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="noKeluarga">Nomor Urut Keluarga:</label>
+                    <input type="text" id="noKeluarga" placeholder="Contoh: K-01 atau 001" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="namaKepala">Nama Kepala Keluarga / Penghuni:</label>
+                    <input type="text" id="namaKepala" placeholder="Masukkan nama lengkap" required>
+                </div>
+                
+                <div class="form-group" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 100px;">
+                        <label for="blokRumah">Blok Rumah:</label>
+                        <input type="text" id="blokRumah" placeholder="Contoh: A atau 01" required>
+                    </div>
+                    <div style="flex: 1; min-width: 100px;">
+                        <label for="noRumah">Nomor Rumah:</label>
+                        <input type="text" id="noRumah" placeholder="Contoh: 12" required>
+                    </div>
+                    <div style="flex: 1; min-width: 80px;">
+                        <label for="rtRumah">RT:</label>
+                        <input type="text" id="rtRumah" placeholder="01" required>
+                    </div>
+                    <div style="flex: 1; min-width: 80px;">
+                        <label for="rwRumah">RW:</label>
+                        <input type="text" id="rwRumah" placeholder="03" required>
+                    </div>
+                </div>
+                
+                <button type="submit" id="btnSimpan">Simpan Data</button>
+            </form>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="inputCari" placeholder="Cari berdasarkan nama atau nomor urut...">
+        </div>
+
+        <div class="card table-container">
+            <h2>Daftar Urutan Data</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No. Bangunan</th>
+                        <th>No. Keluarga</th>
+                        <th>Nama</th>
+                        <th>Alamat Utama</th>
+                        <th>RT</th>
+                        <th>RW</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelBodi">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #888;">Belum ada data atau sedang memuat...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
