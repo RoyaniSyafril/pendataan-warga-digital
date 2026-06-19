@@ -38,10 +38,19 @@ const noRumahInput = document.getElementById("noRumah");
 const rtRumahInput = document.getElementById("rtRumah"); 
 const rwRumahInput = document.getElementById("rwRumah"); 
 const btnSimpan = document.getElementById("btnSimpan");
-const tabelBodi = document.getElementById("tabelBodi");
 
 let semuaData = [];
-let dataTableInstance = null; // Menyimpan instance jalannya DataTables
+// Langsung inisialisasi DataTables 1 kali saja di awal biar tidak destroy-bikin ulang terus
+let dataTableInstance = $('#tabelWarga').DataTable({
+    "paging": true,      
+    "ordering": true,    
+    "info": true,        
+    "searching": true,   
+    "responsive": true,  
+    "columnDefs": [
+        { "orderable": false, "targets": 6 }
+    ]
+});
 
 // ==========================================
 // FITUR 1: SIMPAN / UPDATE DATA
@@ -85,31 +94,21 @@ dataForm.addEventListener("submit", async (e) => {
 });
 
 // ==========================================
-// FITUR 2: BACA DATA REAL-TIME
+// FITUR 2: BACA DATA REAL-TIME (OPTIMAL VERSION)
 // ==========================================
 const q = query(dataCollectionRef, orderBy("no_urut_bangunan", "asc"));
 
 onSnapshot(q, (snapshot) => {
     semuaData = [];
-    snapshot.forEach((doc) => {
-        semuaData.push({ id: doc.id, ...doc.data() });
-    });
-    tampilkanData(semuaData);
-});
-
-// ==========================================
-// FITUR 3: TAMPILKAN DATA KE TABEL + DATA TABLES
-// ==========================================
-function tampilkanData(daftarData) {
-    // Hancurkan DataTables lama jika ada, agar tidak duplikat saat data di-render ulang
-    if ($.fn.DataTable.isDataTable('#tabelWarga')) {
-        $('#tabelWarga').DataTable().destroy();
-    }
-
-    tabelBodi.innerHTML = "";
     
-    daftarData.forEach((item) => {
-        const alamatRaw = item.alamat;
+    // Kosongkan baris DataTables tanpa menghancurkan strukturnya
+    dataTableInstance.clear();
+
+    snapshot.forEach((doc) => {
+        const item = { id: doc.id, ...doc.data() };
+        semuaData.push(item);
+
+        const alamatRaw = item.alamat || "";
         let alamatUtama = alamatRaw;
         let rtValue = "-";
         let rwValue = "-";
@@ -121,52 +120,37 @@ function tampilkanData(daftarData) {
             rwValue = partSisa.split(" RW. ")[1].trim();  
         }
 
-        const baris = document.createElement("tr");
-        baris.innerHTML = `
-            <td>${item.no_urut_bangunan}</td>
-            <td>${item.no_urut_keluarga}</td>
-            <td>${item.nama_kepala_keluarga}</td>
-            <td>${alamatUtama}</td>
-            <td style="text-align: center;">${rtValue}</td>
-            <td style="text-align: center;">${rwValue}</td>
-            <td>
-                <div style="display: flex; gap: 5px;">
-                    <button class="btn-edit" data-id="${item.id}" style="background-color: #f1c40f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Edit</button>
-                    <button class="btn-delete" data-id="${item.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Hapus</button>
-                </div>
-            </td>
-        `;
-        tabelBodi.appendChild(baris);
+        // Masukkan data langsung ke baris internal DataTables (Sangat Cepat & Ringan!)
+        dataTableInstance.row.add([
+            item.no_urut_bangunan,
+            item.no_urut_keluarga,
+            item.nama_kepala_keluarga,
+            alamatUtama,
+            `<div style="text-align: center;">${rtValue}</div>`,
+            `<div style="text-align: center;">${rwValue}</div>`,
+            `<div style="display: flex; gap: 5px;">
+                <button class="btn-edit" data-id="${item.id}" style="background-color: #f1c40f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Edit</button>
+                <button class="btn-delete" data-id="${item.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Hapus</button>
+            </div>`
+        ]);
     });
 
-    // Jalankan Fitur Menggunakan DataTables Library
-    dataTableInstance = $('#tabelWarga').DataTable({
-        "paging": true,      
-        "ordering": true,    
-        "info": true,        
-        "searching": true,   
-        "responsive": true,  
-        "columnDefs": [
-            { "orderable": false, "targets": 6 } // Mematikan fitur sortir khusus untuk kolom "Aksi"
-        ]
-    });
+    // Gambar ulang tabel yang datanya sudah berubah (tanpa kedip/loading lama)
+    dataTableInstance.draw(false);
+});
 
-    // ==========================================================
-    // FIX: EVENT DELEGATION AGAR TOMBOL WORK DI HP DAN DATATABLES
-    // ==========================================================
-    
-    // Event Klik untuk Tombol Edit
-    $('#tabelWarga').off('click', '.btn-edit').on('click', '.btn-edit', function() {
-        const idSelected = $(this).attr('data-id');
-        isiFormUntukEdit(idSelected);
-    });
+// ==========================================================
+// FITUR 3: EVENT DELEGATION JQUERY (TETAP AKTIF)
+// ==========================================================
+$('#tabelWarga').off('click', '.btn-edit').on('click', '.btn-edit', function() {
+    const idSelected = $(this).attr('data-id');
+    isiFormUntukEdit(idSelected);
+});
 
-    // Event Klik untuk Tombol Hapus
-    $('#tabelWarga').off('click', '.btn-delete').on('click', '.btn-delete', function() {
-        const idSelected = $(this).attr('data-id');
-        hapusDataWarga(idSelected);
-    });
-}
+$('#tabelWarga').off('click', '.btn-delete').on('click', '.btn-delete', function() {
+    const idSelected = $(this).attr('data-id');
+    hapusDataWarga(idSelected);
+});
 
 // ==========================================
 // FITUR TARIK DATA KE FORM UNTUK EDIT
