@@ -24,12 +24,12 @@
 
                 <div class="form-group">
                     <label for="noBangunan">Nomor Urut Bangunan:</label>
-                    <input type="text" id="noBangunan" placeholder="Contoh: B-01 atau 001" required>
+                    <input type="text" id="noBangunan" inputmode="numeric" pattern="[0-9]*" placeholder="Contoh: B-01 atau 001" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="noKeluarga">Nomor Urut Keluarga:</label>
-                    <input type="text" id="noKeluarga" placeholder="Contoh: K-01 atau 001" required>
+                    <input type="text" id="noKeluarga" inputmode="numeric" pattern="[0-9]*" placeholder="Contoh: K-01 atau 001" required>
                 </div>
                 
                 <div class="form-group">
@@ -48,11 +48,11 @@
                     </div>
                     <div style="flex: 1; min-width: 80px;">
                         <label for="rtRumah">RT:</label>
-                        <input type="text" id="rtRumah" placeholder="01" required>
+                        <input type="text" id="rtRumah" inputmode="numeric" pattern="[0-9]*" placeholder="01" required>
                     </div>
                     <div style="flex: 1; min-width: 80px;">
                         <label for="rwRumah">RW:</label>
-                        <input type="text" id="rwRumah" placeholder="03" required>
+                        <input type="text" id="rwRumah" inputmode="numeric" pattern="[0-9]*" placeholder="03" required>
                     </div>
                 </div>
                 
@@ -62,7 +62,8 @@
 
         <div class="card table-container">
     <h2>Daftar Urutan Data</h2>
-<table id="tabelWarga" class="display nowrap" style="width:100%">        <thead>
+<table id="tabelWarga" class="display nowrap" style="width:100%">
+            <thead>
             <tr>
                 <th>No. Bangunan</th>
                 <th>No. Keluarga</th>
