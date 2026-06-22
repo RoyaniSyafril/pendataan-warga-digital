@@ -38,20 +38,48 @@ const noRumahInput = document.getElementById("noRumah");
 const rtRumahInput = document.getElementById("rtRumah"); 
 const rwRumahInput = document.getElementById("rwRumah"); 
 const btnSimpan = document.getElementById("btnSimpan");
+const tableContainer = document.querySelector(".table-container");
 
 let semuaData = [];
-// Langsung inisialisasi DataTables dengan fitur Scroll Horizontal
-let dataTableInstance = $('#tabelWarga').DataTable({
-    "paging": true,      
-    "ordering": true,    
-    "info": true,        
-    "searching": true,   
-    "scrollX": true,      // <--- UTAMA: Hidupkan scroll horizontal agar semua isi terlihat
-    "responsive": false,  // <--- UTAMA: Matikan fitur sembunyikan kolom (plus +)
-    "columnDefs": [
-        { "orderable": false, "targets": 6 }, // Matikan sortir kolom aksi
-        { "width": "120px", "targets": 3 }    // Batasi lebar kolom alamat utama agar tidak terlalu panjang
-    ]
+let danymicTables = {}; 
+
+// --- RAKIT TOMBOL BATAL SECARA DINAMIS ---
+const actionsWrapper = document.createElement("div");
+actionsWrapper.className = "form-actions-wrapper";
+btnSimpan.before(actionsWrapper);
+actionsWrapper.appendChild(btnSimpan);
+
+const btnBatal = document.createElement("button");
+btnBatal.type = "button";
+btnBatal.id = "btnBatal";
+btnBatal.className = "btn-batal";
+btnBatal.textContent = "Batal";
+actionsWrapper.appendChild(btnBatal);
+
+// --- TRANSFORMASI JUDUL FORM MENJADI COLLAPSE BAR ---
+const formCard = dataForm.closest('.card');
+const formTitle = formCard.querySelector('h2');
+if (formTitle) {
+    const headerWrapper = document.createElement('div');
+    headerWrapper.className = 'form-collapse-header';
+    headerWrapper.id = 'toggleFormBtn';
+    headerWrapper.innerHTML = `
+        <span>📝 Tambah / Edit Data Warga</span>
+        <span class="form-arrow-icon">▼</span>
+    `;
+    formTitle.replaceWith(headerWrapper);
+}
+
+// Efek klik buka-tutup (Collapse) untuk Form
+$(document).on('click', '#toggleFormBtn', function() {
+    const arrow = $(this).find('.form-arrow-icon');
+    $(dataForm).slideToggle(200, function() {
+        if ($(dataForm).is(':visible')) {
+            arrow.text('▼');
+        } else {
+            arrow.text('►');
+        }
+    });
 });
 
 // ==========================================
@@ -86,6 +114,7 @@ dataForm.addEventListener("submit", async (e) => {
             alert("Data berhasil diperbarui!");
             btnSimpan.textContent = "Simpan Data";
             btnSimpan.style.backgroundColor = "#3498db";
+            $(btnBatal).hide();
         }
         dataForm.reset();
         dataIdInput.value = "";
@@ -96,15 +125,22 @@ dataForm.addEventListener("submit", async (e) => {
 });
 
 // ==========================================
-// FITUR 2: BACA DATA REAL-TIME (OPTIMAL VERSION)
+// FITUR 2: BACA DATA REAL-TIME & PENGELOMPOKAN
 // ==========================================
 const q = query(dataCollectionRef, orderBy("no_urut_bangunan", "asc"));
 
 onSnapshot(q, (snapshot) => {
     semuaData = [];
     
-    // Kosongkan baris DataTables tanpa menghancurkan strukturnya
-    dataTableInstance.clear();
+    Object.keys(danymicTables).forEach(key => {
+        if ($.fn.DataTable.isDataTable(`#tabelWarga_${key}`)) {
+            $(`#tabelWarga_${key}`).DataTable().destroy();
+        }
+    });
+    danymicTables = {};
+    tableContainer.innerHTML = '<h2>Daftar Urutan Data per RT/RW</h2>';
+
+    const kelompokRT_RW = {};
 
     snapshot.forEach((doc) => {
         const item = { id: doc.id, ...doc.data() };
@@ -112,8 +148,8 @@ onSnapshot(q, (snapshot) => {
 
         const alamatRaw = item.alamat || "";
         let alamatUtama = alamatRaw;
-        let rtValue = "-";
-        let rwValue = "-";
+        let rtValue = "00";
+        let rwValue = "00";
 
         if (alamatRaw.includes(" RT. ") && alamatRaw.includes(" RW. ")) {
             alamatUtama = alamatRaw.split(" RT. ")[0].trim(); 
@@ -122,36 +158,109 @@ onSnapshot(q, (snapshot) => {
             rwValue = partSisa.split(" RW. ")[1].trim();  
         }
 
-        // Masukkan data langsung ke baris internal DataTables (Sangat Cepat & Ringan!)
-        dataTableInstance.row.add([
-            item.no_urut_bangunan,
-            item.no_urut_keluarga,
-            item.nama_kepala_keluarga,
-            alamatUtama,
-            `<div style="text-align: center;">${rtValue}</div>`,
-            `<div style="text-align: center;">${rwValue}</div>`,
-            `<div style="display: flex; gap: 5px;">
-                <button class="btn-edit" data-id="${item.id}" style="background-color: #f1c40f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Edit</button>
-                <button class="btn-delete" data-id="${item.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Hapus</button>
-            </div>`
-        ]);
+        const keyGroup = `rt${rtValue}_rw${rwValue}`;
+        const namaGroupLabel = `RT ${rtValue} / RW ${rwValue}`;
+
+        if (!kelompokRT_RW[keyGroup]) {
+            kelompokRT_RW[keyGroup] = { label: namaGroupLabel, warga: [] };
+        }
+
+        kelompokRT_RW[keyGroup].warga.push({ ...item, alamatUtama, rtValue, rwValue });
     });
 
-    // Gambar ulang tabel yang datanya sudah berubah (tanpa kedip/loading lama)
-    dataTableInstance.draw(false);
+    Object.keys(kelompokRT_RW).sort().forEach((key) => {
+        const grup = kelompokRT_RW[key];
+
+        const collapseWrapper = document.createElement("div");
+        collapseWrapper.className = "rt-rw-group-wrapper";
+        collapseWrapper.innerHTML = `
+            <div class="collapse-header" data-target="${key}">
+                <span>📍 Data Wilayah: ${grup.label} <small>(${grup.warga.length} Bangunan)</small></span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="collapse-content active" id="content_${key}">
+                <table id="tabelWarga_${key}" class="display nowrap dynamic-warga-table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No. Urut Bangunan</th>
+                            <th>No. Urut Keluarga</th>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th style="text-align: center;">RT</th>
+                            <th style="text-align: center;">RW</th>
+                            <th class="no-sort">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodi_${key}"></tbody>
+                </table>
+            </div>
+        `;
+        tableContainer.appendChild(collapseWrapper);
+
+        const tBodiSpesifik = document.getElementById(`bodi_${key}`);
+        grup.warga.forEach((warga) => {
+            const baris = document.createElement("tr");
+            baris.innerHTML = `
+                <td>${warga.no_urut_bangunan}</td>
+                <td>${warga.no_urut_keluarga}</td>
+                <td>${warga.nama_kepala_keluarga}</td>
+                <td>${warga.alamatUtama}</td>
+                <td style="text-align: center;">${warga.rtValue}</td>
+                <td style="text-align: center;">${warga.rwValue}</td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-edit" data-id="${warga.id}" style="background-color: #f1c40f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Edit</button>
+                        <button class="btn-delete" data-id="${warga.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Hapus</button>
+                    </div>
+                </td>
+            `;
+            tBodiSpesifik.appendChild(baris);
+        });
+
+        danymicTables[key] = $(`#tabelWarga_${key}`).DataTable({
+            "paging": true, "ordering": true, "info": true, "searching": true, "scrollX": true, "responsive": false,
+            "columnDefs": [{ "orderable": false, "targets": 6 }]
+        });
+    });
 });
 
-// ==========================================================
-// FITUR 3: EVENT DELEGATION JQUERY (TETAP AKTIF)
-// ==========================================================
-$('#tabelWarga').off('click', '.btn-edit').on('click', '.btn-edit', function() {
+// ==========================================
+// FITUR 3: TRIGGER EVENT DELEGATION
+// ==========================================
+$(document).off('click', '.collapse-header').on('click', '.collapse-header', function() {
+    const targetKey = $(this).attr('data-target');
+    const contentArea = $(`#content_${targetKey}`);
+    const arrow = $(this).find('.arrow-icon');
+
+    contentArea.slideToggle(200, function() {
+        if (contentArea.is(':visible') && $.fn.DataTable.isDataTable(`#tabelWarga_${targetKey}`)) {
+            $(`#tabelWarga_${targetKey}`).DataTable().columns.adjust().draw();
+        }
+    });
+    
+    $(this).toggleClass('collapsed-mode');
+    if ($(this).hasClass('collapsed-mode')) { arrow.text('►'); } else { arrow.text('▼'); }
+});
+
+$(document).off('click', '.btn-edit').on('click', '.btn-edit', function() {
     const idSelected = $(this).attr('data-id');
     isiFormUntukEdit(idSelected);
 });
 
-$('#tabelWarga').off('click', '.btn-delete').on('click', '.btn-delete', function() {
+$(document).off('click', '.btn-delete').on('click', '.btn-delete', function() {
     const idSelected = $(this).attr('data-id');
     hapusDataWarga(idSelected);
+});
+
+// LOGIKA KETIKA TOMBOL BATAL DIKLIK
+$(document).on('click', '#btnBatal', function() {
+    dataForm.reset();
+    dataIdInput.value = "";
+    btnSimpan.textContent = "Simpan Data";
+    btnSimpan.style.backgroundColor = "#3498db";
+    $(this).hide();
+    $(dataForm).slideUp(200);
+    $('#toggleFormBtn').find('.form-arrow-icon').text('►');
 });
 
 // ==========================================
@@ -160,6 +269,11 @@ $('#tabelWarga').off('click', '.btn-delete').on('click', '.btn-delete', function
 function isiFormUntukEdit(id) {
     const dataDipilih = semuaData.find(item => item.id === id);
     if (dataDipilih) {
+        if (!$(dataForm).is(':visible')) {
+            $(dataForm).slideDown(200);
+            $('#toggleFormBtn').find('.form-arrow-icon').text('▼');
+        }
+
         dataIdInput.value = dataDipilih.id;
         noBangunanInput.value = dataDipilih.no_urut_bangunan;
         noKeluargaInput.value = dataDipilih.no_urut_keluarga;
@@ -174,10 +288,8 @@ function isiFormUntukEdit(id) {
         if (alamatRaw.includes("BLOK H - ") && alamatRaw.includes(" NO. ") && alamatRaw.includes(" RT. ") && alamatRaw.includes(" RW. ")) {
             const partBlok = alamatRaw.split("BLOK H - ")[1]; 
             blokValue = partBlok.split(" NO. ")[0].trim(); 
-            
             const partNo = partBlok.split(" NO. ")[1]; 
             noRumahValue = partNo.split(" RT. ")[0].trim(); 
-            
             const partRT = partNo.split(" RT. ")[1]; 
             rtValue = partRT.split(" RW. ")[0].trim(); 
             rwValue = partRT.split(" RW. ")[1].trim(); 
@@ -194,6 +306,8 @@ function isiFormUntukEdit(id) {
 
         btnSimpan.textContent = "Perbarui Data Warga";
         btnSimpan.style.backgroundColor = "#2ecc71";
+        $(btnBatal).show(); 
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }

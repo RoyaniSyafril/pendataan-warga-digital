@@ -189,3 +189,120 @@ tr:hover {
         display: inline-block;
     }
 }
+
+/* ==========================================
+   DESAIN BOX COLLAPSE GRUP RT / RW 
+   ========================================== */
+.rt-rw-group-wrapper {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.collapse-header {
+    background: #2c3e50;
+    color: #ffffff;
+    padding: 12px 18px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.collapse-header:hover {
+    background: #34495e;
+}
+
+.collapse-header small {
+    color: #cbd5e1;
+    margin-left: 8px;
+    font-weight: 400;
+}
+
+.collapse-header .arrow-icon {
+    font-size: 0.85rem;
+    transition: transform 0.2s;
+}
+
+.collapse-content {
+    padding: 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+}
+
+/* Kustomisasi pelengkap agar tabel dinamis tidak tabrakan style */
+.dynamic-warga-table {
+    margin-bottom: 10px !important;
+}
+
+
+/* ==========================================
+   DESAIN BAR COLLAPSE UNTUK FORM INPUT
+   ========================================== */
+.form-collapse-header {
+    background: #3498db; /* Warna biru biar senada dengan tombol simpan */
+    color: #ffffff;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0; /* Melengkung di bagian atas saja */
+    user-select: none;
+    transition: background 0.2s;
+    margin: -25px -25px 20px -25px; /* Menarik header agar penuh ke ujung card */
+}
+
+.form-collapse-header:hover {
+    background: #2980b9;
+}
+
+.form-collapse-header .arrow-icon {
+    font-size: 0.85rem;
+}
+
+/* Modifikasi sedikit padding card form agar pas saat di-collapse */
+.card:has(#dataForm) {
+    overflow: hidden; /* Mencegah isi form keluar jalur melengkung */
+    padding-top: 25px;
+}
+
+
+/* ==========================================
+   DESAIN LAYOUT TOMBOL AKSI FORM (SIMPAN & BATAL)
+   ========================================== */
+.form-actions-wrapper {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-batal {
+    background-color: #95a5a6; /* Warna abu-abu netral */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1; /* Membagi ruang sama rata dengan tombol simpan */
+    transition: background-color 0.2s;
+    display: none; /* Sembunyikan dulu di awal, muncul hanya saat edit */
+}
+
+.btn-batal:hover {
+    background-color: #7f8c8d;
+}
+
+#btnSimpan {
+    flex: 1; /* Biar tombol simpan elastis saat tombol batal muncul */
+}
