@@ -313,11 +313,9 @@ async function updateKoordinatWarga(id, x, y) {
 $(document).off('click', '.btn-cetak').on('click', '.btn-cetak', function(e) {
     e.stopPropagation();
     const targetKey = $(this).attr('data-print');
+    const $currentGroup = $(this).closest('.rt-rw-group-wrapper');
     
-    // 1. HAPUS SUNTIKAN LANDSCAPE GLOBAL 
-    // (Serahkan sepenuhnya ke CSS @media print yang membagi halaman 1 landscape & halaman 2 portrait)
-
-    // 2. BONGKAR DATATABLES (Agar baris data warga keluar semua)
+    // 1. BONGKAR DATATABLES (Agar baris data warga keluar semua)
     let dataTableInstance = dynamicTables[targetKey];
     let ukuranHalamanSemula = 10; 
 
@@ -326,22 +324,36 @@ $(document).off('click', '.btn-cetak').on('click', '.btn-cetak', function(e) {
         dataTableInstance.page.len(-1).draw(); 
     }
 
-    // Sembunyikan grup RT lain di layar monitor agar fokus pada target yang dicetak
-    $('.rt-rw-group-wrapper').hide();
-    $(this).closest('.rt-rw-group-wrapper').addClass('print-active-mode').show();
+    // 2. SEMBUNYIKAN GRUP RT LAIN (Hanya tampilkan yang sedang dicetak)
+    // Simpan status elemen yang sedang aktif/terbuka sebelum dicetak
+    const $otherGroups = $('.rt-rw-group-wrapper').not($currentGroup);
+    
+    $otherGroups.hide();
+    $currentGroup.addClass('print-active-mode').show();
 
-    // 3. Jalankan proses cetak browser
+    // 3. JALANKAN PROSES CETAK BROWSER
     setTimeout(() => {
         window.print();
 
-        // 4. KEMBALIKAN SEMUANYA KE SEMULA (Normalisasi Tampilan Monitor)
+        // 4. KEMBALIKAN SEMUANYA KE SEMULA (Normalisasi Tampilan Monitor & HP)
         if (dataTableInstance) {
             dataTableInstance.page.len(ukuranHalamanSemula).draw(); 
         }
 
-        $('.rt-rw-group-wrapper').removeClass('print-active-mode').show(); 
+        $currentGroup.removeClass('print-active-mode');
+        
+        // FIX: Jangan langsung .show() semua grup!
+        // Kembalikan ke sistem filter awal. Jika di HP sedang memfilter RT tertentu,
+        // biarkan grup lain tetap tersembunyi seperti semula.
+        if (typeof kembalikanFilterHalaman === "function") {
+            kembalikanFilterHalaman(); // Panggil fungsi filter bawaan aplikasi jika ada
+        } else {
+            // Jika tidak ada fungsi filter global, kembalikan kontrol ke kondisi sebelum tombol cetak diklik
+            $otherGroups.css('display', ''); 
+        }
+
         aplikasikanSkalaZoom(targetKey); // Sinkronisasi ulang zoom monitor
-    }, 300);
+    }, 500); // Naikkan ke 500ms agar perangkat HP punya waktu merender DataTables raksasa (-1) sebelum cetak
 });
 
 // Accordion Collapse Menu
