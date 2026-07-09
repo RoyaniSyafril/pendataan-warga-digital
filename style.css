@@ -559,6 +559,30 @@ table.dataTable td button {
    9. MEDIA PRINT (MURNI HANYA AKTIF SAAT TOMBOL CETAK DITEKAN)
    ========================================================================= */
 @media print {
+
+    /* --- ATURAN FILTER SAKTI UNTUK HP & LAPTOP --- */
+    /* Jika body memiliki class 'siap-cetak', sembunyikan semua grup RT/RW secara paksa */
+    body.siap-cetak .rt-rw-group-wrapper {
+        display: none !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Hanya munculkan grup RT/RW yang sedang diklik tombol cetaknya */
+    body.siap-cetak .rt-rw-group-wrapper.target-cetak {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    
+    /* Pastikan pembungkus datanya juga terlihat */
+    body.siap-cetak .rt-rw-group-wrapper.target-cetak .collapse-content {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
     /* 1. Sembunyikan semua tombol sistem, form, dan navigasi */
     #dataForm, #toggleFormBtn, .form-collapse-header, .btn-edit, .btn-delete,
     .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_length,
@@ -639,21 +663,23 @@ table.dataTable td button {
     .kotak-rumah.terdata span { 
         color: #065f46 !important; 
     }
+
+    /* --- ATURAN AGAR DATA WARGA LENGKAP & TIDAK TERPOTONG --- */
+    .table-responsive, .dataTables_wrapper, table {
+        overflow: visible !important;
+        display: table !important; /* Paksa balik ke format table murni agar tidak terpotong flexbox/block */
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        page-break-inside: auto !important;
+    }
     
-    /* Pengaturan Cetak Tabel Warga */
-    .table-responsive, .dataTables_wrapper { 
-        overflow: visible !important; 
-        height: auto !important; 
-        max-height: none !important; 
-        page-break-before: avoid !important; 
+    tr {
+        page-break-inside: avoid !important; /* Mencegah baris warga terpotong di tengah halaman */
+        page-break-after: auto !important;
     }
-    table, .dynamic-warga-table { 
-        width: 100% !important; 
-        border-collapse: collapse !important; 
-        page-break-inside: auto !important; 
-    }
-    tr { 
-        page-break-inside: avoid !important; 
-        page-break-after: auto !important; 
+    
+    td, th {
+        word-break: break-word !important; /* Jika teks di HP kepanjangan, lipat ke bawah agar tidak hilang */
     }
 }
