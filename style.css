@@ -286,3 +286,52 @@ h2 { font-size: 1.2rem; margin-top: 0; color: #334155; }
     transition: all 0.3s ease;
     z-index: 999 !important;               /* Memastikan kotak berada di paling depan */
 }
+
+/* =========================================================================
+   PENGATURAN KHUSUS SAAT PRINT (CETAK LEWAT HP / LAPTOP)
+   ========================================================================= */
+@media print {
+    /* 1. Sembunyikan Tombol Undo & Redo melayang agar tidak mengotori kertas */
+    #panelUndoRedoPeta,
+    .opsi-kotak-btn,
+    button, 
+    form, 
+    nav, 
+    .navbar,
+    .sidebar {
+        display: none !important;
+    }
+
+    /* 2. Atur ukuran halaman cetak (A4 otomatis / Portrait atau Landscape) */
+    @page {
+        size: A4 landscape; /* Disarankan landscape karena ukuran denah kamu lebar (3200px) */
+        margin: 10mm;
+    }
+
+    /* 3. Rapikan container utama agar fokus ke denah yang aktif saja */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 4. Pastikan Grid Peta tidak terpotong dan menyembunyikan rumah RT lain yang tidak aktif */
+    #idKontainerPeta { /* Sesuaikan dengan ID kontainer peta kamu */
+        border: none !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* 5. Optimasi visual kotak rumah saat diprint agar hemat tinta tapi tetap kontras */
+    .kotak-rumah.terdata {
+        -webkit-print-color-adjust: exact; /* Memaksa HP mencetak warna background kotak */
+        print-color-adjust: exact;
+        border: 1px solid #000000 !important;
+        box-shadow: none !important;
+    }
+}
