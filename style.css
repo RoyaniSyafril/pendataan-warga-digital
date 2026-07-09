@@ -1,337 +1,585 @@
-/* --- CSS Reset & Layout Utama --- */
+/* =========================================================================
+   1. GLOBAL RESET & VARIABEL WARNA MODERN (TAILWIND STYLE)
+   ========================================================================= */
+:root {
+    --bg-main: #f8fafc;        /* Abu-abu sangat lembut untuk background */
+    --card-bg: #ffffff;        /* Putih bersih untuk kontainer */
+    --text-main: #0f172a;      /* Slate tua hampir hitam untuk teks utama */
+    --text-muted: #64748b;     /* Slate muda untuk sub-teks */
+    --border-color: #e2e8f0;   /* Garis pembatas tipis elegan */
+    
+    /* Palet Warna Aksi */
+    --primary: #3b82f6;        /* Biru modern */
+    --primary-hover: #2563eb;
+    --success: #10b981;        /* Hijau Zamrud/Emerald (Teduh di mata) */
+    --success-border: #059669;
+    --danger: #ef4444;         /* Merah modern */
+    --warning: #f59e0b;        /* Amber hangat */
+    --neutral-btn: #94a3b8;    /* Tombol batal */
+    
+    /* Radius & Shadow */
+    --radius-md: 10px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8fafc;
-    margin: 0; padding: 20px; color: #1e293b;
-}
-.container { max-width: 1200px; margin: 0 auto; }
-h1 { text-align: center; color: #0f172a; font-size: 1.8rem; margin-bottom: 25px; }
-.card {
-    background: #ffffff; border-radius: 8px; padding: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px;
-}
-h2 { font-size: 1.2rem; margin-top: 0; color: #334155; }
-
-/* --- Struktur Form Input --- */
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; }
-.form-group input {
-    width: 100%; padding: 10px; border: 1px solid #cbd5e1;
-    border-radius: 5px; box-sizing: border-box; font-size: 0.95rem;
-}
-.form-group input:focus { border-color: #3b82f6; outline: none; }
-.form-actions-wrapper { display: flex; gap: 10px; margin-top: 15px; }
-#btnSimpan, .btn-batal {
-    flex: 1; padding: 12px; border: none; border-radius: 5px;
-    color: white; font-weight: bold; cursor: pointer; font-size: 0.95rem;
-}
-#btnSimpan { background-color: #3498db; }
-.btn-batal { background-color: #94a3b8; }
-
-/* --- Form & RT Group Collapse Bar --- */
-.form-collapse-header, .collapse-header {
-    background: #1e293b; color: #ffffff; padding: 12px 15px;
-    border-radius: 6px; cursor: pointer; display: flex;
-    justify-content: space-between; font-weight: bold; align-items: center;
-}
-.collapse-header { background: #334155; margin-top: 15px; }
-.collapse-content { padding: 15px 5px; }
-
-/* --- SOLUSI: KANVAS DIBAIKAL JADI LUAS & MELEGAKAN --- */
-.grid-peta-rumah {
-    position: relative;
-    /* --- DIUBAH: Ukuran kanvas diperlebar agar muat lebih banyak rumah --- */
-    width: 3200px;  /* Sebelumnya 1800px */
-    height: 1600px; /* Sebelumnya 800px */
-    
-    background-color: #f1f5f9; /* Warna dasar kanvas (abu-abu sangat muda) */
-    
-    /* --- MEMBUAT GARIS-GARIS KOTAK SAMAR --- */
-    background-image: 
-        linear-gradient(to right, rgba(148, 163, 184, 0.15) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-    
-    /* Ukurannya disamakan persis dengan logika matematika magnet (80px x 55px) */
-    background-size: 80px 55px; 
-    
-    /* Geser sedikit background sebesar 10px agar pas dengan posisi start kotak rumah (+10) */
-    background-position: 10px 10px;
-    
-    border-radius: 6px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    margin: 0; 
+    padding: 24px; 
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
 }
-/* Pembungkus luar kanvas agar kalau kepanjangan bisa di-scroll dengan rapi */
+
+.container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    width: 100%;
+}
+
+h1 { 
+    text-align: center; 
+    color: var(--text-main); 
+    font-size: 2rem; 
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 30px; 
+}
+
+.card {
+    background: var(--card-bg); 
+    border-radius: var(--radius-md); 
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md); 
+    margin-bottom: 24px;
+}
+
+h2 { 
+    font-size: 1.25rem; 
+    font-weight: 700;
+    margin-top: 0; 
+    margin-bottom: 16px;
+    color: var(--text-main); 
+    letter-spacing: -0.02em;
+}
+
+/* =========================================================================
+   2. FORM INPUT YANG RAPI & RESPONSIVE
+   ========================================================================= */
+.form-group { 
+    margin-bottom: 18px; 
+}
+
+.form-group label { 
+    display: block; 
+    font-weight: 600; 
+    font-size: 0.85rem; 
+    color: var(--text-muted);
+    margin-bottom: 6px; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-group input {
+    width: 100%; 
+    padding: 12px 14px; 
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); 
+    box-sizing: border-box; 
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-group input:focus { 
+    border-color: var(--primary); 
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    outline: none; 
+}
+
+.form-actions-wrapper { 
+    display: flex; 
+    gap: 12px; 
+    margin-top: 20px; 
+}
+
+button, #btnSimpan, .btn-batal {
+    font-family: inherit;
+    padding: 12px 20px; 
+    border: none; 
+    border-radius: var(--radius-sm);
+    font-weight: 600; 
+    cursor: pointer; 
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+#btnSimpan { 
+    background-color: var(--primary); 
+    color: white; 
+}
+#btnSimpan:hover { 
+    background-color: var(--primary-hover); 
+    transform: translateY(-1px);
+}
+
+.btn-batal { 
+    background-color: #f1f5f9; 
+    color: #475569;
+    border: 1px solid var(--border-color);
+}
+.btn-batal:hover { 
+    background-color: #e2e8f0; 
+}
+
+/* =========================================================================
+   3. HEADERS COLLAPSE (TOMBOL LIPAT DATA RT)
+   ========================================================================= */
+.form-collapse-header, .collapse-header {
+    background: #1e293b; 
+    color: #ffffff; 
+    padding: 14px 20px;
+    border-radius: var(--radius-md); 
+    cursor: pointer; 
+    display: flex;
+    justify-content: space-between; 
+    font-weight: 600; 
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.2s;
+}
+.form-collapse-header:hover { background: #0f172a; }
+
+.collapse-header { 
+    background: #ffffff; 
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    margin-top: 16px; 
+}
+.collapse-header:hover {
+    background: #f8fafc;
+}
+
+.collapse-content { 
+    padding: 20px 8px 8px 8px; 
+}
+
+.btn-cetak {
+    background-color: #f3e8ff; 
+    color: #7e22ce; 
+    border: 1px solid #e9d5ff;
+    padding: 8px 16px; 
+    border-radius: var(--radius-sm); 
+    font-weight: 600; 
+    font-size: 0.85rem; 
+}
+.btn-cetak:hover { 
+    background-color: #e9d5ff;
+    transform: translateY(-1px);
+}
+
+/* =========================================================================
+   4. AREA KANVAS PETA (SANGAT BERSIH & RAPI)
+   ========================================================================= */
 .canvas-scroll-container {
     width: 100%;
     overflow: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #fff;
-    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    padding: 16px;
+    box-sizing: border-box;
+    box-shadow: var(--shadow-sm);
 }
 
-/* --- SOLUSI: KOTAK RUMAH DI-MINIMALISIR (SANGAT COMPACT) --- */
+.canvas-viewport {
+    display: inline-block; 
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    transform-origin: top left;
+}
+
+.grid-peta-rumah {
+    position: relative;
+    width: 3200px;  
+    height: 1600px; 
+    background-color: #f8fafc; 
+    background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+    background-size: 40px 40px; 
+    background-position: 10px 10px;
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+}
+
+/* =========================================================================
+   5. KOTAK RUMAH DESAIN MODERN SLATE
+   ========================================================================= */
 .kotak-rumah {
     position: absolute; 
-    width: 74px;        /* Diperkecil signifikan agar tidak makan tempat */
-    min-height: 48px;   /* Tingginya dibuat super compact */
-    border: 2px solid #cbd5e1;
-    border-radius: 4px;
-    padding: 4px 2px;   
+    width: 76px;        
+    min-height: 50px;   
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 4px;   
     text-align: center;
-    background: #f1f5f9;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 700;
     cursor: move; 
-    transition: opacity 0.1s ease;
     box-sizing: border-box;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
 }
+.kotak-rumah:hover {
+    box-shadow: var(--shadow-md);
+    transform: scale(1.02);
+    z-index: 10;
+}
+
 .kotak-rumah.terdata {
-    background: #2ecc71 !important; border-color: #27ae60 !important;
+    background: #d1fae5 !important; 
+    border-color: #a7f3d0 !important;
+    color: #065f46 !important;
 }
-.kotak-rumah.terdata span { color: #ffffff !important; }
-
-/* --- Tombol Cetak Denah --- */
-.btn-cetak {
-    background-color: #9b59b6; color: white; border: none;
-    padding: 6px 12px; border-radius: 4px; cursor: pointer;
-    font-weight: 600; font-size: 0.85rem; transition: background 0.2s;
-}
-.btn-cetak:hover { background-color: #8e44ad; }
-
-/* --- Pop-up Modal Detail --- */
-.modal-detail-overlay {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.5); display: flex; align-items: center;
-    justify-content: center; z-index: 9999; padding: 15px;
-}
-.modal-detail-box {
-    background: #fff; padding: 20px; border-radius: 8px;
-    width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-.modal-detail-box h3 { margin-top:0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-.detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
-.detail-label { color: #64748b; }
-.detail-value { font-weight: 600; text-align: right; }
-.modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-.btn-modal-close, .btn-modal-edit {
-    flex:1; padding: 10px; border:none; border-radius: 4px; font-weight:bold; cursor:pointer;
-}
-.btn-modal-close { background: #e2e8f0; color: #334155; }
-.btn-modal-edit { background: #f1c40f; color: #fff; }
-
-/* --- CSS Pengaturan Cetak Urutan Bangunan --- */
-@media print {
-    body { background: white; padding: 0; }
-    .container { max-width: 100%; width: 100%; }
-    
-    /* 1. SEMBUNYIKAN SEMUA ELEMEN UI & PANEL KENDALI ZOOM PETA */
-    #dataForm, #toggleFormBtn, .form-collapse-header, .btn-edit, .btn-delete,
-    .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_paginate, .dataTables_wrapper .dataTables_info,
-    .arrow-icon, .btn-cetak,
-    .zoom-control-panel, .btn-lacak-peta, .dataTables_scrollHead, .table-container > h2
-    {
-        display: none !important;
-    }
-    
-    .collapse-content { 
-        display: block !important; 
-        padding: 0;
-        height: auto !important;
-        max-height: none !important;
-        overflow: visible !important;
-    }
-    
-    .card { box-shadow: none; padding: 0; margin-bottom: 0; }
-    
-/* 2. BONGKAR BINGKAI KONTEN */
-    .canvas-scroll-container { 
-        border: none !important; 
-        background: transparent !important;
-        padding: 0 !important; 
-        overflow: visible !important; 
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-    }
-
-    /* Pintu gerbang viewport pembungkus skala */
-    .canvas-viewport {
-        transform: none !important; 
-        display: block !important;
-        
-        /* 
-           SINKRONISASI BARU (Skala 0.45): 
-           Kita perlebar dinding fisiknya ke 1440px x 720px agar menampung denah yang sudah diperbesar.
-           max-width: 100% menjaga agar ukurannya tetap presisi memadati kertas Landscape.
-        */
-        width: 1600px !important;
-        height: 800px !important;
-        max-width: 100% !important;
-        
-        page-break-after: always !important; /* Potong halaman tepat setelah denah */
-    }
-    
-    /* 3. SETELAN PERBESARAN DENAH (VERSI LEBIH BESAR & GAGAH) */
-    .grid-peta-rumah { 
-        border: none !important;            
-        background: transparent !important;  
-        box-shadow: none !important;
-        display: block !important;
-        page-break-inside: avoid; 
-        
-        /* TETAP: Koordinat plot mutlak Anda */
-        width: 3200px !important; 
-        height: 1600px !important; 
-        
-        zoom: normal !important; 
-        
-        /* 
-           KUNCI PERBESARAN: Kita naikkan dari 0.35 menjadi 0.45.
-           Bangunan akan terlihat jauh lebih besar, jelas, dan padat memenuhi Halaman 1.
-        */
-        transform: scale(0.50) !important; 
-        transform-origin: top left !important;
-        
-        margin: 0 !important;
-    }
-
-    /* 4. PAKSA TABEL WARGA MASUK KE HALAMAN BERIKUTNYA */
-    .table-responsive, 
-    .dataTables_wrapper {
-        overflow: visible !important;
-        height: auto !important;
-        max-height: none !important;
-        
-        /* KUNCI 2 (PERBAIKAN): Ubah dari 'always' menjadi 'avoid'.
-           Karena lembaran baru sudah dipicu oleh .canvas-viewport di atas, 
-           tabel otomatis mulai di halaman 2. Jangan dipotong lagi di sini agar tidak memicu halaman kosong. */
-        page-break-before: avoid !important; 
-    }
-
-    table, .dynamic-warga-table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        page-break-inside: auto !important;
-    }
-
-    tr {
-        page-break-inside: avoid !important;
-        page-break-after: auto !important;
-    }
+.kotak-rumah.terdata span { 
+    color: #065f46 !important; 
 }
 
+.kotak-highlight-flash {
+    background-color: #fee2e2 !important; 
+    color: #991b1b !important;                
+    border: 2.5px solid #fca5a5 !important;  
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important; 
+    transform: scale(1.1) !important;                 
+    z-index: 999 !important;               
+}
 
-/* --- Tambahan Desain Fitur Zoom Denah --- */
+/* =========================================================================
+   6. OPTIMASI TABEL WARGA (RAPAT, COMFORTABLE & ANTI-MEMANJANG)
+   ========================================================================= */
+.table-container {
+    margin-top: 10px;
+}
+
+/* Kunci utama penyelarasan DataTables scroll baris header & body */
+.dataTables_scrollHeadInner, 
+.dataTables_scrollHeadInner table,
+table.dataTable, 
+.dynamic-warga-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 0.85rem !important; 
+    color: var(--text-main);
+    margin: 8px 0 !important;
+    table-layout: fixed !important; /* Memaksa kolom patuh pada ukuran px di bawah */
+}
+
+/* Merampingkan & Merapatkan Header */
+table.dataTable th, 
+.dynamic-warga-table th {
+    background-color: #f1f5f9 !important; 
+    color: #475569 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem !important; 
+    letter-spacing: 0.03em;
+    padding: 8px 6px !important; 
+    border-bottom: 2px solid var(--border-color) !important;
+    text-align: left;
+    white-space: normal !important; /* Membuat teks header panjang bisa patah kebawah */
+    vertical-align: bottom !important;
+}
+
+/* Mengunci teks isi sel tabel agar turun kebawah jika kepanjangan */
+table.dataTable td, 
+.dynamic-warga-table td {
+    padding: 5px 6px !important; 
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;  
+    word-break: break-word !important; 
+}
+
+/* =========================================================================
+   ATURAN FIX LEBAR TIAP KOLOM TABEL (MURNI CSS - ULTRA RAPAT & EFISIEN)
+   ========================================================================= */
+
+/* --- CONFIGURATION GLOBAL UNTUK SEMUA HEADER (th) AGAR OTOMATIS PATAH --- */
+table.dataTable th, .dynamic-warga-table th {
+    white-space: normal !important;      /* Izinkan semua teks header patah ke bawah */
+    word-break: break-word !important;   /* Paksa kata panjang patah jika space habis */
+    line-height: 1.1 !important;         /* Jarak antar baris header yang patah rapat */
+    vertical-align: bottom !important;   /* Sejajarkan tulisan di bawah th */
+}
+
+/* Kolom 1: No. Urut Bangunan (Sempit pas seukuran angka) */
+table.dataTable th:nth-child(1) {
+    width: 55px !important;
+    max-width: 15px !important;
+    text-align: center !important;
+    word-spacing: -2px !important;       /* Memaksa kata "No. Urut Bangunan" berbaris vertikal */
+}
+table.dataTable td:nth-child(1) {
+    width: 55px !important;
+    max-width: 55px !important;
+    text-align: center !important;
+}
+
+/* Kolom 2: No. Urut Keluarga (Sempit pas seukuran angka) */
+table.dataTable th:nth-child(2) {
+    width: 55px !important;
+    max-width: 15px !important;
+    text-align: center !important;
+    word-spacing: -2px !important;       /* Memaksa kata "No. Urut Keluarga" berbaris vertikal */
+}
+table.dataTable td:nth-child(2) {
+    width: 55px !important;
+    max-width: 55px !important;
+    text-align: center !important;
+}
+
+/* Kolom 3: Nama Warga (Dipersempit pas seukuran nama standar, teks panjang otomatis bungkus) */
+table.dataTable th:nth-child(3), table.dataTable td:nth-child(3) {
+    width: 130px !important;
+    max-width: 130px !important;
+}
+
+/* Kolom 4: Alamat Rumah (Dipersempit maksimal, jika jalan/nomor kepanjangan akan turun ke bawah) */
+table.dataTable th:nth-child(4), table.dataTable td:nth-child(4) {
+    width: 160px !important;
+    max-width: 160px !important;
+}
+
+/* Kolom 5: RT (Super Sempit seukuran 2-3 digit angka) */
+table.dataTable th:nth-child(5), table.dataTable td:nth-child(5) {
+    width: 35px !important;
+    max-width: 35px !important;
+    text-align: center !important;
+}
+
+/* Kolom 6: RW (Super Sempit seukuran 2-3 digit angka) */
+table.dataTable th:nth-child(6), table.dataTable td:nth-child(6) {
+    width: 35px !important;
+    max-width: 35px !important;
+    text-align: center !important;
+}
+
+/* Kolom 7: Tombol Aksi (Pas seukuran dua buah icon / tombol kecil berdampingan) */
+table.dataTable th:nth-child(7), table.dataTable td:nth-child(7) {
+    width: 85px !important;
+    max-width: 85px !important;
+    text-align: center !important;
+    white-space: nowrap !important;     /* Khusus tombol aksi jangan sampai patah ke bawah */
+}
+
+/* Efek Zebra Ringan & Hover */
+table.dataTable tbody tr:nth-child(even),
+.dynamic-warga-table tbody tr:nth-child(even) {
+    background-color: #f8fafc !important; 
+}
+
+table.dataTable tbody tr:hover,
+.dynamic-warga-table tbody tr:hover {
+    background-color: #f1f5f9 !important; 
+}
+
+/* Tombol Aksi Mini */
+.btn-edit-tabel, 
+.btn-delete-tabel,
+table.dataTable td button {
+    padding: 3px 6px !important; 
+    font-size: 0.72rem !important;
+    border-radius: 4px !important;
+    margin: 1px !important;
+}
+
+/* Input DataTables Filter */
+.dataTables_wrapper .dataTables_length select, 
+.dataTables_wrapper .dataTables_filter input {
+    padding: 4px 8px !important;
+    font-size: 0.8rem !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 4px !important;
+}
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    margin-top: 8px !important;
+}
+
+/* =========================================================================
+   7. FLOATING KONTROL PANEL ZOOM & POPUP MODAL
+   ========================================================================= */
 .zoom-control-panel {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f8fafc;
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    margin-bottom: 10px;
+    background: #ffffff;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
 }
+
 .zoom-buttons {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
+
 .btn-zoom, .btn-zoom-reset {
     background: #ffffff;
-    border: 1px solid #cbd5e1;
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
     font-size: 0.85rem;
-    font-weight: bold;
-    transition: all 0.15s;
+    font-weight: 600;
+    color: #475569;
 }
 .btn-zoom:hover, .btn-zoom-reset:hover {
-    background: #e2e8f0;
-    border-color: #94a3b8;
+    background: #f1f5f9;
+    color: var(--text-main);
 }
+
 .zoom-text {
     font-family: monospace;
-    font-weight: bold;
+    font-weight: 700;
     font-size: 0.9rem;
-    min-width: 45px;
+    min-width: 50px;
     text-align: center;
-    color: #334155;
+    color: var(--text-muted);
 }
 
-/* Modifikasi viewport penampung transformasi zoom */
-.canvas-viewport {
-    display: inline-block; /* Mengikuti ukuran kanvas murni di dalamnya */
-    transition: transform 0.15s ease-out; /* Animasi smooth saat di-zoom */
+/* Modal Detail */
+.modal-detail-overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(15, 23, 42, 0.3); 
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; 
+    z-index: 9999; padding: 16px;
 }
-.canvas-scroll-container {
-    width: 100%;
-    overflow: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #ffffff;
-    padding: 10px;
+.modal-detail-box {
+    background: #fff; padding: 24px; border-radius: var(--radius-md);
+    width: 100%; max-width: 380px; box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
     box-sizing: border-box;
 }
+.modal-detail-box h3 { margin-top:0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; font-weight: 800; }
+.detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+.detail-label { color: var(--text-muted); }
+.detail-value { font-weight: 600; color: var(--text-main); }
 
-/* Efek saat rumah dilacak dari tabel */
-.kotak-highlight-flash {
-    background-color: #e74c3c !important; /* Warna merah solid */
-    color: white !important;                /* Warna teks di dalam kotak jadi putih */
-    border: 3px solid #c0392b !important;  /* Border merah tua */
-    box-shadow: 0 0 20px #e74c3c !important; /* Efek kilau merah di sekitar kotak */
-    transform: scale(1.1);                 /* Sedikit memperbesar kotak agar menonjol */
-    transition: all 0.3s ease;
-    z-index: 999 !important;               /* Memastikan kotak berada di paling depan */
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-modal-close, .btn-modal-edit { flex:1; padding: 10px; border-radius: var(--radius-sm); font-weight:600; }
+.btn-modal-close { background: #f1f5f9; color: #475569; }
+.btn-modal-edit { background: var(--warning); color: #fff; }
+
+#panelUndoRedoPeta {
+    background: #ffffff !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border-radius: 30px !important; 
+    padding: 6px 12px !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
 }
 
 /* =========================================================================
-   PENGATURAN KHUSUS SAAT PRINT (CETAK LEWAT HP / LAPTOP)
+   8. MEDIA QUERIES MOBILE HP SUPER RESPONSIF (DI BAWAH 768px)
+   ========================================================================= */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    .card {
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: var(--radius-sm);
+    }
+    .form-actions-wrapper {
+        flex-direction: column;
+        gap: 10px;
+    }
+    #btnSimpan, .btn-batal {
+        width: 100%;
+    }
+    .zoom-control-panel {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+    }
+    .zoom-buttons {
+        justify-content: space-between;
+    }
+    .collapse-header {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+    .dataTables_wrapper, .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+    }
+    /* Setelan ekstra rapat khusus tabel saat dilihat di HP */
+    table.dataTable, 
+    .dynamic-warga-table {
+        font-size: 0.75rem !important; 
+    }
+    table.dataTable td, 
+    table.dataTable th {
+        padding: 4px 6px !important; 
+        max-width: 110px !important; 
+    }
+}
+
+/* =========================================================================
+   9. MEDIA PRINT (BERSIH DARI TOMBOL SISTEM SAAT DICETAK)
    ========================================================================= */
 @media print {
-    /* 1. Sembunyikan Tombol Undo & Redo melayang agar tidak mengotori kertas */
-    #panelUndoRedoPeta,
-    .opsi-kotak-btn,
-    button, 
-    form, 
-    nav, 
-    .navbar,
-    .sidebar {
+    #dataForm, #toggleFormBtn, .form-collapse-header, .btn-edit, .btn-delete,
+    .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_paginate, .dataTables_wrapper .dataTables_info,
+    .arrow-icon, .btn-cetak, .zoom-control-panel, .btn-lacak-peta, .dataTables_scrollHead, 
+    .table-container > h2, #panelUndoRedoPeta, .opsi-kotak-btn, button, form, nav, .navbar, .sidebar {
         display: none !important;
     }
-
-    /* 2. Atur ukuran halaman cetak (A4 otomatis / Portrait atau Landscape) */
-    @page {
-        size: A4 landscape; /* Disarankan landscape karena ukuran denah kamu lebar (3200px) */
-        margin: 10mm;
-    }
-
-    /* 3. Rapikan container utama agar fokus ke denah yang aktif saja */
-    body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    /* 4. Pastikan Grid Peta tidak terpotong dan menyembunyikan rumah RT lain yang tidak aktif */
-    #idKontainerPeta { /* Sesuaikan dengan ID kontainer peta kamu */
-        border: none !important;
-        box-shadow: none !important;
-        background: #ffffff !important;
-        position: relative !important;
-        width: 100% !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    /* 5. Optimasi visual kotak rumah saat diprint agar hemat tinta tapi tetap kontras */
-    .kotak-rumah.terdata {
-        -webkit-print-color-adjust: exact; /* Memaksa HP mencetak warna background kotak */
-        print-color-adjust: exact;
-        border: 1px solid #000000 !important;
-        box-shadow: none !important;
-    }
+    @page { size: A4 landscape; margin: 8mm; }
+    body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; margin: 0 !important; }
+    .container { max-width: 100% !important; width: 100% !important; }
+    .card { box-shadow: none !important; padding: 0 !important; margin-bottom: 0 !important; background: transparent !important; }
+    .collapse-content { display: block !important; padding: 0 !important; height: auto !important; max-height: none !important; overflow: visible !important; }
+    .canvas-scroll-container { border: none !important; background: transparent !important; padding: 0 !important; overflow: visible !important; display: block !important; width: 100% !important; height: auto !important; }
+    .canvas-viewport { transform: none !important; display: block !important; width: 1600px !important; height: 800px !important; max-width: 100% !important; page-break-after: always !important; }
+    .grid-peta-rumah, #idKontainerPeta { border: none !important; background: #ffffff !important; box-shadow: none !important; display: block !important; position: absolute !important; width: 3200px !important; height: 1600px !important; transform: scale(0.50) !important; transform-origin: top left !important; margin: 0 !important; zoom: normal !important; }
+    .kotak-rumah { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; border: 1.5px solid #059669 !important; }
+    .kotak-rumah.terdata { background: #d1fae5 !important; }
+    .kotak-rumah.terdata span { color: #065f46 !important; }
+    .table-responsive, .dataTables_wrapper { overflow: visible !important; height: auto !important; max-height: none !important; page-break-before: avoid !important; }
+    table, .dynamic-warga-table { width: 100% !important; border-collapse: collapse !important; page-break-inside: auto !important; }
+    tr { page-break-inside: avoid !important; page-break-after: auto !important; }
 }
