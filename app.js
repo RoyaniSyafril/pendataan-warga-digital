@@ -1,18 +1,9 @@
-// 1. Import fungsi dari Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    updateDoc,
-    deleteDoc,
-    doc,
-    onSnapshot, 
-    query, 
-    orderBy 
+    getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { gambarPetaKontrolSpesifik } from "./peta.js";
 
-// 2. Konfigurasi Firebase asli milikmu
 const firebaseConfig = {
     apiKey: "AIzaSyAjNv9Dnv4XTVAjmlrP341dKnnsmSReh-c",
     authDomain: "pendataan-warga-digital.firebaseapp.com",
@@ -22,12 +13,11 @@ const firebaseConfig = {
     appId: "1:13081110867:web:d33615732f82e7ecf019a6"
 };
 
-// 3. Inisialisasi Firebase & Firestore Database
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const dataCollectionRef = collection(db, "data-bangunan");
 
-// 4. Ambil Elemen DOM
+// Ambil Elemen DOM
 const dataForm = document.getElementById("dataForm");
 const dataIdInput = document.getElementById("dataId");
 const noBangunanInput = document.getElementById("noBangunan");
@@ -41,66 +31,59 @@ const btnSimpan = document.getElementById("btnSimpan");
 const tableContainer = document.querySelector(".table-container");
 
 let semuaData = [];
-let danymicTables = {}; 
+let dynamicTables = {}; 
+let zoomScales = {}; // Menyimpan level zoom aktif untuk masing-masing RT
 
-// --- RAKIT TOMBOL BATAL SECARA DINAMIS ---
+// Rakit Tombol Batal
 const actionsWrapper = document.createElement("div");
 actionsWrapper.className = "form-actions-wrapper";
 btnSimpan.before(actionsWrapper);
 actionsWrapper.appendChild(btnSimpan);
 
 const btnBatal = document.createElement("button");
-btnBatal.type = "button";
-btnBatal.id = "btnBatal";
-btnBatal.className = "btn-batal";
-btnBatal.textContent = "Batal";
+btnBatal.type = "button"; btnBatal.id = "btnBatal"; btnBatal.className = "btn-batal"; btnBatal.textContent = "Batal";
 actionsWrapper.appendChild(btnBatal);
+$(btnBatal).hide();
 
-// --- TRANSFORMASI JUDUL FORM MENJADI COLLAPSE BAR ---
+// Collapse Form Bar Header
 const formCard = dataForm.closest('.card');
 const formTitle = formCard.querySelector('h2');
 if (formTitle) {
     const headerWrapper = document.createElement('div');
-    headerWrapper.className = 'form-collapse-header';
-    headerWrapper.id = 'toggleFormBtn';
-    headerWrapper.innerHTML = `
-        <span>📝 Tambah / Edit Data Warga</span>
-        <span class="form-arrow-icon">▼</span>
-    `;
+    headerWrapper.className = 'form-collapse-header'; headerWrapper.id = 'toggleFormBtn';
+    headerWrapper.innerHTML = `<span>📝 Tambah / Edit Data Warga</span><span class="form-arrow-icon">▼</span>`;
     formTitle.replaceWith(headerWrapper);
 }
 
-// Efek klik buka-tutup (Collapse) untuk Form
 $(document).on('click', '#toggleFormBtn', function() {
     const arrow = $(this).find('.form-arrow-icon');
     $(dataForm).slideToggle(200, function() {
-        if ($(dataForm).is(':visible')) {
-            arrow.text('▼');
-        } else {
-            arrow.text('►');
-        }
+        arrow.text($(dataForm).is(':visible') ? '▼' : '►');
     });
 });
 
-// ==========================================
-// FITUR 1: SIMPAN / UPDATE DATA
-// ==========================================
+// SIMPAN / UPDATE DATA
 dataForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
     const idDokumen = dataIdInput.value;
-    const blok = blokRumahInput.value.trim().toUpperCase();
-    const nomor = noRumahInput.value.trim().toUpperCase();
-    const rt = rtRumahInput.value.trim();
-    const rw = rwRumahInput.value.trim();
-    
-    const alamatLengkap = `VILA DAGO ALAM ASRI I, BLOK H - ${blok} NO. ${nomor} RT. ${rt} RW. ${rw}`;
+
+    const bngVal = noBangunanInput.value.trim();
+    const famVal = noKeluargaInput.value.trim();
+    const namaVal = namaKepalaInput.value.trim();
+    const blokVal = blokRumahInput.value.trim().toUpperCase();
+    const noRumahVal = noRumahInput.value.trim().toUpperCase();
+    const rtVal = rtRumahInput.value.trim().replace(/\D/g, '').padStart(3, '0'); // Bersihkan non-angka
+    const rwVal = rwRumahInput.value.trim().replace(/\D/g, '').padStart(3, '0');
 
     const dataWarga = {
-        no_urut_bangunan: noBangunanInput.value.trim(),
-        no_urut_keluarga: noKeluargaInput.value.trim(),
-        nama_kepala_keluarga: namaKepalaInput.value.trim(),
-        alamat: alamatLengkap
+        no_urut_bangunan: bngVal,
+        no_urut_keluarga: famVal,
+        nama_kepala_keluarga: namaVal,
+        blok: blokVal,
+        no_rumah: noRumahVal,
+        rt: rtVal,
+        rw: rwVal,
+        alamat: `VILA DAGO ALAM ASRI I, BLOK H - ${blokVal} NO. ${noRumahVal} RT. ${rtVal} RW. ${rwVal}`
     };
 
     try {
@@ -112,80 +95,118 @@ dataForm.addEventListener("submit", async (e) => {
             const docRef = doc(db, "data-bangunan", idDokumen);
             await updateDoc(docRef, dataWarga);
             alert("Data berhasil diperbarui!");
-            btnSimpan.textContent = "Simpan Data";
-            btnSimpan.style.backgroundColor = "#3498db";
-            $(btnBatal).hide();
         }
-        dataForm.reset();
-        dataIdInput.value = "";
+        resetForm();
     } catch (error) {
-        console.error("Error: ", error);
+        console.error(error);
         alert("Gagal memproses data.");
     }
 });
 
-// ==========================================
-// FITUR 2: BACA DATA REAL-TIME & PENGELOMPOKAN
-// ==========================================
+// REAL-TIME ON SNAPSHOT (FIX AUTO-SCROLL LOOMING)
 const q = query(dataCollectionRef, orderBy("no_urut_bangunan", "asc"));
 
 onSnapshot(q, (snapshot) => {
-    semuaData = [];
-    
-    Object.keys(danymicTables).forEach(key => {
-        if ($.fn.DataTable.isDataTable(`#tabelWarga_${key}`)) {
-            $(`#tabelWarga_${key}`).DataTable().destroy();
+    // 1. AMBIL DAN SIMPAN POSISI SCROLL SEBELUM CONTAINER DIHANCURKAN
+    const posisiScrollLama = {};
+    $('.canvas-scroll-container').each(function() {
+        const idContainer = $(this).closest('.collapse-content').attr('id');
+        if (idContainer) {
+            posisiScrollLama[idContainer] = {
+                left: $(this).scrollLeft(),
+                top: $(this).scrollTop()
+            };
         }
     });
-    danymicTables = {};
+
+    semuaData = [];
+    Object.keys(dynamicTables).forEach(key => {
+        if ($.fn.DataTable.isDataTable(`#tabelWarga_${key}`)) {
+            $(`#tabelWarga_${key}`).DataTable().destroy(true); // Hapus bersih tabel dari DOM
+        }
+    });
+    dynamicTables = {};
     tableContainer.innerHTML = '<h2>Daftar Urutan Data per RT/RW</h2>';
 
     const kelompokRT_RW = {};
 
-    snapshot.forEach((doc) => {
-        const item = { id: doc.id, ...doc.data() };
+    snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        
+        let rtLama = "000"; let rwLama = "000"; let blokLama = "?"; let noRumahLama = "?";
+        const alamatRaw = d.alamat || "";
+
+        if (!d.rt && alamatRaw.includes(" RT. ") && alamatRaw.includes(" RW. ")) {
+            const partSisa = alamatRaw.split(" RT. ")[1]; 
+            rtLama = partSisa.split(" RW. ")[0].trim().padStart(3, '0');  
+            rwLama = partSisa.split(" RW. ")[1].trim().padStart(3, '0');  
+            
+            if (alamatRaw.includes("BLOK H - ") && alamatRaw.includes(" NO. ")) {
+                const partBlok = alamatRaw.split("BLOK H - ")[1]; 
+                blokLama = partBlok.split(" NO. ")[0].trim();
+                noRumahLama = partBlok.split(" NO. ")[1].split(" RT. ")[0].trim();
+            }
+        }
+
+        const item = { 
+            id: docSnap.id, 
+            ...d,
+            blok: d.blok || blokLama,
+            no_rumah: d.no_rumah || noRumahLama,
+            rt: (d.rt || rtLama).padStart(3, '0'),
+            rw: (d.rw || rwLama).padStart(3, '0')
+        };
         semuaData.push(item);
 
-        const alamatRaw = item.alamat || "";
-        let alamatUtama = alamatRaw;
-        let rtValue = "00";
-        let rwValue = "00";
-
-        if (alamatRaw.includes(" RT. ") && alamatRaw.includes(" RW. ")) {
-            alamatUtama = alamatRaw.split(" RT. ")[0].trim(); 
-            const partSisa = alamatRaw.split(" RT. ")[1]; 
-            rtValue = partSisa.split(" RW. ")[0].trim();  
-            rwValue = partSisa.split(" RW. ")[1].trim();  
-        }
-
-        const keyGroup = `rt${rtValue}_rw${rwValue}`;
-        const namaGroupLabel = `RT ${rtValue} / RW ${rwValue}`;
-
+        const keyGroup = `rt${item.rt}_rw${item.rw}`;
         if (!kelompokRT_RW[keyGroup]) {
-            kelompokRT_RW[keyGroup] = { label: namaGroupLabel, warga: [] };
+            kelompokRT_RW[keyGroup] = { label: `RT ${item.rt} / RW ${item.rw}`, warga: [] };
         }
-
-        kelompokRT_RW[keyGroup].warga.push({ ...item, alamatUtama, rtValue, rwValue });
+        kelompokRT_RW[keyGroup].warga.push(item);
     });
 
+    // Render Tabel & Peta Kelompok Wilayah dengan Fitur Zoom
     Object.keys(kelompokRT_RW).sort().forEach((key) => {
         const grup = kelompokRT_RW[key];
+        
+        if (!zoomScales[key]) zoomScales[key] = 1.0;
 
         const collapseWrapper = document.createElement("div");
         collapseWrapper.className = "rt-rw-group-wrapper";
         collapseWrapper.innerHTML = `
             <div class="collapse-header" data-target="${key}">
                 <span>📍 Data Wilayah: ${grup.label} <small>(${grup.warga.length} Bangunan)</small></span>
-                <span class="arrow-icon">▼</span>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button class="btn-cetak" data-print="${key}" style="z-index: 10;">🖨️ Cetak Denah & Data</button>
+                    <span class="arrow-icon">▼</span>
+                </div>
             </div>
             <div class="collapse-content active" id="content_${key}">
+                <div style="margin-bottom: 20px; padding: 5px 10px;">
+                    
+                    <div class="zoom-control-panel">
+                        <span style="font-size:0.85rem; font-weight:bold; color:#64748b;">🗺️ Peta Kendali Urutan Bangunan:</span>
+                        <div class="zoom-buttons">
+                            <button class="btn-zoom" data-zoom-action="out" data-rt="${key}">➖</button>
+                            <span class="zoom-text" id="zoomText_${key}">100%</span>
+                            <button class="btn-zoom" data-zoom-action="in" data-rt="${key}">➕</button>
+                            <button class="btn-zoom-reset" data-zoom-action="reset" data-rt="${key}">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="canvas-scroll-container">
+                        <div id="canvasViewport_${key}" class="canvas-viewport" style="transform: scale(1); transform-origin: top left;">
+                            <div id="gridPetaRumah_${key}" class="grid-peta-rumah"></div>
+                        </div>
+                    </div>
+                </div>
                 <table id="tabelWarga_${key}" class="display nowrap dynamic-warga-table" style="width:100%">
                     <thead>
                         <tr>
                             <th>No. Urut Bangunan</th>
                             <th>No. Urut Keluarga</th>
                             <th>Nama</th>
-                            <th>Alamat</th>
+                            <th>Alamat Rumah</th>
                             <th style="text-align: center;">RT</th>
                             <th style="text-align: center;">RW</th>
                             <th class="no-sort">Aksi</th>
@@ -197,6 +218,12 @@ onSnapshot(q, (snapshot) => {
         `;
         tableContainer.appendChild(collapseWrapper);
 
+        // Render objek denah rumah warga
+        gambarPetaKontrolSpesifik(`gridPetaRumah_${key}`, grup.warga, isiFormUntukEdit, updateKoordinatWarga);
+        
+        // Kembalikan ke level zoom terakhir yang aktif
+        aplikasikanSkalaZoom(key);
+
         const tBodiSpesifik = document.getElementById(`bodi_${key}`);
         grup.warga.forEach((warga) => {
             const baris = document.createElement("tr");
@@ -204,126 +231,195 @@ onSnapshot(q, (snapshot) => {
                 <td>${warga.no_urut_bangunan}</td>
                 <td>${warga.no_urut_keluarga}</td>
                 <td>${warga.nama_kepala_keluarga}</td>
-                <td>${warga.alamatUtama}</td>
-                <td style="text-align: center;">${warga.rtValue}</td>
-                <td style="text-align: center;">${warga.rwValue}</td>
+                <td>BLOK H - ${warga.blok} NO. ${warga.no_rumah}</td>
+                <td style="text-align: center;">${warga.rt}</td>
+                <td style="text-align: center;">${warga.rw}</td>
                 <td>
-                    <div style="display: flex; gap: 5px;">
-                        <button class="btn-edit" data-id="${warga.id}" style="background-color: #f1c40f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Edit</button>
-                        <button class="btn-delete" data-id="${warga.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">Hapus</button>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button class="btn-lacak-peta" data-id="${warga.id}" data-rt="${key}" style="background-color: #9b59b6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">📍 Peta</button>                        
+                        <button class="btn-edit" data-id="${warga.id}" style="background-color: #f1c40f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Edit</button>
+                        <button class="btn-delete" data-id="${warga.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Hapus</button>
                     </div>
                 </td>
             `;
             tBodiSpesifik.appendChild(baris);
         });
 
-        danymicTables[key] = $(`#tabelWarga_${key}`).DataTable({
-            "paging": true, "ordering": true, "info": true, "searching": true, "scrollX": true, "responsive": false,
+        dynamicTables[key] = $(`#tabelWarga_${key}`).DataTable({
+            "paging": true, "ordering": true, "info": true, "searching": true, "scrollX": true,
             "columnDefs": [{ "orderable": false, "targets": 6 }]
         });
+
+        // 2. KEMBALIKAN POSISI SCROLL SECARA INSTAN SETELAH ELEMENT RE-RENDER
+        const idContent = `content_${key}`;
+        if (posisiScrollLama[idContent]) {
+            const containerPeta = $(`#${idContent} .canvas-scroll-container`);
+            containerPeta.scrollLeft(posisiScrollLama[idContent].left);
+            containerPeta.scrollTop(posisiScrollLama[idContent].top);
+        }
     });
 });
 
-// ==========================================
-// FITUR 3: TRIGGER EVENT DELEGATION
-// ==========================================
+// Handler Pengatur Zoom Kontainer Peta
+$(document).off('click', '.btn-zoom, .btn-zoom-reset').on('click', '.btn-zoom, .btn-zoom-reset', function(e) {
+    e.stopPropagation();
+    const rtKey = $(this).attr('data-rt');
+    const aksi = $(this).attr('data-zoom-action');
+
+    if (aksi === "in" && zoomScales[rtKey] < 2.0) {
+        zoomScales[rtKey] += 0.15;
+    } else if (aksi === "out" && zoomScales[rtKey] > 0.4) {
+        zoomScales[rtKey] -= 0.15;
+    } else if (aksi === "reset") {
+        zoomScales[rtKey] = 1.0;
+    }
+
+    aplikasikanSkalaZoom(rtKey);
+});
+
+// Fungsi Aplikasi CSS Transform Zoom
+function aplikasikanSkalaZoom(rtKey) {
+    const viewport = document.getElementById(`canvasViewport_${rtKey}`);
+    const textLabel = document.getElementById(`zoomText_${rtKey}`);
+    if (viewport && textLabel) {
+        const skalaPersen = Math.round(zoomScales[rtKey] * 100);
+        viewport.style.transform = `scale(${zoomScales[rtKey]})`;
+        textLabel.textContent = `${skalaPersen}%`;
+
+        const gridPeta = document.getElementById(`gridPetaRumah_${rtKey}`);
+        if(gridPeta) {
+            gridPeta.setAttribute('data-skala-aktif', zoomScales[rtKey]);
+        }
+    }
+}
+
+// Simpan Posisi Baru ke Firebase
+async function updateKoordinatWarga(id, x, y) {
+    try {
+        const docRef = doc(db, "data-bangunan", id);
+        await updateDoc(docRef, {
+            pos_x: x,
+            pos_y: y
+        });
+        console.log(`Koordinat posisi baru berhasil disimpan.`);
+    } catch (error) {
+        console.error("Gagal menyimpan posisi baru: ", error);
+    }
+}
+
+// =========================================================================
+// HANDLER CETAK / PRINT DENAH & DATA WARGA (VERSI FIX MULTI-ORIENTASI)
+// =========================================================================
+$(document).off('click', '.btn-cetak').on('click', '.btn-cetak', function(e) {
+    e.stopPropagation();
+    const targetKey = $(this).attr('data-print');
+    
+    // 1. HAPUS SUNTIKAN LANDSCAPE GLOBAL 
+    // (Serahkan sepenuhnya ke CSS @media print yang membagi halaman 1 landscape & halaman 2 portrait)
+
+    // 2. BONGKAR DATATABLES (Agar baris data warga keluar semua)
+    let dataTableInstance = dynamicTables[targetKey];
+    let ukuranHalamanSemula = 10; 
+
+    if (dataTableInstance) {
+        ukuranHalamanSemula = dataTableInstance.page.len(); 
+        dataTableInstance.page.len(-1).draw(); 
+    }
+
+    // Sembunyikan grup RT lain di layar monitor agar fokus pada target yang dicetak
+    $('.rt-rw-group-wrapper').hide();
+    $(this).closest('.rt-rw-group-wrapper').addClass('print-active-mode').show();
+
+    // 3. Jalankan proses cetak browser
+    setTimeout(() => {
+        window.print();
+
+        // 4. KEMBALIKAN SEMUANYA KE SEMULA (Normalisasi Tampilan Monitor)
+        if (dataTableInstance) {
+            dataTableInstance.page.len(ukuranHalamanSemula).draw(); 
+        }
+
+        $('.rt-rw-group-wrapper').removeClass('print-active-mode').show(); 
+        aplikasikanSkalaZoom(targetKey); // Sinkronisasi ulang zoom monitor
+    }, 300);
+});
+
+// Accordion Collapse Menu
 $(document).off('click', '.collapse-header').on('click', '.collapse-header', function() {
     const targetKey = $(this).attr('data-target');
-    const contentArea = $(`#content_${targetKey}`);
-    const arrow = $(this).find('.arrow-icon');
-
-    contentArea.slideToggle(200, function() {
-        if (contentArea.is(':visible') && $.fn.DataTable.isDataTable(`#tabelWarga_${targetKey}`)) {
-            $(`#tabelWarga_${targetKey}`).DataTable().columns.adjust().draw();
-        }
-    });
-    
+    $(`#content_${targetKey}`).slideToggle(200);
     $(this).toggleClass('collapsed-mode');
-    if ($(this).hasClass('collapsed-mode')) { arrow.text('►'); } else { arrow.text('▼'); }
+    $(this).find('.arrow-icon').text($(this).hasClass('collapsed-mode') ? '►' : '▼');
 });
 
-$(document).off('click', '.btn-edit').on('click', '.btn-edit', function() {
-    const idSelected = $(this).attr('data-id');
-    isiFormUntukEdit(idSelected);
-});
+$(document).on('click', '.btn-edit', function() { isiFormUntukEdit($(this).attr('data-id')); });
+$(document).on('click', '.btn-delete', function() { hapusDataWarga($(this).attr('data-id')); });
+$(document).on('click', '#btnBatal', function() { resetForm(); });
 
-$(document).off('click', '.btn-delete').on('click', '.btn-delete', function() {
-    const idSelected = $(this).attr('data-id');
-    hapusDataWarga(idSelected);
-});
-
-// LOGIKA KETIKA TOMBOL BATAL DIKLIK
-$(document).on('click', '#btnBatal', function() {
-    dataForm.reset();
-    dataIdInput.value = "";
-    btnSimpan.textContent = "Simpan Data";
-    btnSimpan.style.backgroundColor = "#3498db";
-    $(this).hide();
-    $(dataForm).slideUp(200);
-    $('#toggleFormBtn').find('.form-arrow-icon').text('►');
-});
-
-// ==========================================
-// FITUR TARIK DATA KE FORM UNTUK EDIT
-// ==========================================
 function isiFormUntukEdit(id) {
-    const dataDipilih = semuaData.find(item => item.id === id);
-    if (dataDipilih) {
-        if (!$(dataForm).is(':visible')) {
-            $(dataForm).slideDown(200);
-            $('#toggleFormBtn').find('.form-arrow-icon').text('▼');
-        }
-
-        dataIdInput.value = dataDipilih.id;
-        noBangunanInput.value = dataDipilih.no_urut_bangunan;
-        noKeluargaInput.value = dataDipilih.no_urut_keluarga;
-        namaKepalaInput.value = dataDipilih.nama_kepala_keluarga;
-        
-        const alamatRaw = dataDipilih.alamat;
-        let blokValue = "";
-        let noRumahValue = "";
-        let rtValue = "";
-        let rwValue = "";
-
-        if (alamatRaw.includes("BLOK H - ") && alamatRaw.includes(" NO. ") && alamatRaw.includes(" RT. ") && alamatRaw.includes(" RW. ")) {
-            const partBlok = alamatRaw.split("BLOK H - ")[1]; 
-            blokValue = partBlok.split(" NO. ")[0].trim(); 
-            const partNo = partBlok.split(" NO. ")[1]; 
-            noRumahValue = partNo.split(" RT. ")[0].trim(); 
-            const partRT = partNo.split(" RT. ")[1]; 
-            rtValue = partRT.split(" RW. ")[0].trim(); 
-            rwValue = partRT.split(" RW. ")[1].trim(); 
-        } else if (alamatRaw.includes("BLOK H - ") && alamatRaw.includes(" NO. ")) {
-            const partBlok = alamatRaw.split("BLOK H - ")[1];
-            blokValue = partBlok.split(" NO. ")[0].trim();
-            noRumahValue = partBlok.split(" NO. ")[1].trim();
-        }
-
-        blokRumahInput.value = blokValue;
-        noRumahInput.value = noRumahValue;
-        rtRumahInput.value = rtValue;
-        rwRumahInput.value = rwValue;
+    const d = semuaData.find(item => item.id === id);
+    if (d) {
+        if (!$(dataForm).is(':visible')) { $(dataForm).slideDown(200); $('#toggleFormBtn').find('.form-arrow-icon').text('▼'); }
+        dataIdInput.value = d.id;
+        noBangunanInput.value = d.no_urut_bangunan;
+        noKeluargaInput.value = d.no_urut_keluarga;
+        namaKepalaInput.value = d.nama_kepala_keluarga;
+        blokRumahInput.value = d.blok;
+        noRumahInput.value = d.no_rumah;
+        rtRumahInput.value = d.rt;
+        rwRumahInput.value = d.rw;
 
         btnSimpan.textContent = "Perbarui Data Warga";
         btnSimpan.style.backgroundColor = "#2ecc71";
         $(btnBatal).show(); 
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
-// ==========================================
-// FITUR EKSEKUSI HAPUS DATA
-// ==========================================
+function resetForm() {
+    dataForm.reset(); dataIdInput.value = "";
+    btnSimpan.textContent = "Simpan Data"; btnSimpan.style.backgroundColor = "#3498db";
+    $(btnBatal).hide(); $(dataForm).slideUp(200); $('#toggleFormBtn').find('.form-arrow-icon').text('►');
+}
+
 async function hapusDataWarga(id) {
-    if (confirm("Apakah Anda yakin ingin menghapus data warga ini dari database?")) {
-        try {
-            const docRef = doc(db, "data-bangunan", id);
-            await deleteDoc(docRef);
-            alert("Data berhasil dihapus!");
-        } catch (error) {
-            console.error("Error saat menghapus: ", error);
-            alert("Gagal menghapus data.");
-        }
+    if (confirm("Hapus data warga ini dari database?")) {
+        try { await deleteDoc(doc(db, "data-bangunan", id)); alert("Data terhapus!"); } catch (e) { alert("Gagal menghapus."); }
     }
 }
+
+// HANDLER: Lacak Lokasi Warga di Peta (Warna Merah + Siap Pindah)
+$(document).on('click', '.btn-lacak-peta', function() {
+    const idWarga = $(this).attr('data-id');
+    const rtKey = $(this).attr('data-rt');
+
+    const gridPeta = document.getElementById(`gridPetaRumah_${rtKey}`);
+    if (!gridPeta) return;
+
+    const kotakTarget = gridPeta.querySelector(`[data-id="${idWarga}"]`);
+    const scrollContainer = gridPeta.closest('.canvas-scroll-container');
+
+    if (kotakTarget && scrollContainer) {
+        const contentArea = $(`#content_${rtKey}`);
+        if (!contentArea.is(':visible')) {
+            contentArea.slideDown(200);
+            $(`.collapse-header[data-target="${rtKey}"]`).removeClass('collapsed-mode').find('.arrow-icon').text('▼');
+        }
+
+        const skalaAktif = parseFloat(gridPeta.getAttribute('data-skala-aktif')) || 1.0;
+        const targetX = (kotakTarget.offsetLeft * skalaAktif) - (scrollContainer.clientWidth / 2) + 37;
+        const targetY = (kotakTarget.offsetTop * skalaAktif) - (scrollContainer.clientHeight / 2) + 24;
+
+        scrollContainer.scrollTo({
+            left: targetX,
+            top: targetY,
+            behavior: 'smooth'
+        });
+
+        // Trigger fungsi klik internal pada kotak agar menyala merah & mengunci mode pemindahan bangunan
+        kotakTarget.click();
+
+    } else {
+        alert("Kotak rumah belum di-plot atau diposisikan di dalam peta denah.");
+    }
+});

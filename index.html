@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <style>
-        /* Sedikit kustomisasi agar serasi dengan style.css milikmu */
         .dataTables_wrapper { margin-top: 15px; }
         .dataTables_filter { margin-bottom: 15px; }
     </style>
@@ -24,12 +23,12 @@
 
                 <div class="form-group">
                     <label for="noBangunan">Nomor Urut Bangunan:</label>
-                    <input type="text" id="noBangunan" inputmode="numeric" pattern="[0-9]*" placeholder="" required>
+                    <input type="text" id="noBangunan" inputmode="numeric" pattern="[0-9]*" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="noKeluarga">Nomor Urut Keluarga:</label>
-                    <input type="text" id="noKeluarga" inputmode="numeric" pattern="[0-9]*" placeholder="" required>
+                    <input type="text" id="noKeluarga" inputmode="numeric" pattern="[0-9]*" required>
                 </div>
                 
                 <div class="form-group">
@@ -48,11 +47,11 @@
                     </div>
                     <div style="flex: 1; min-width: 80px;">
                         <label for="rtRumah">RT:</label>
-                        <input type="text" id="rtRumah" inputmode="numeric" pattern="[0-9]*" placeholder="000" required>
+                        <input type="text" id="rtRumah" inputmode="numeric" pattern="[0-9]*" placeholder="002" required>
                     </div>
                     <div style="flex: 1; min-width: 80px;">
                         <label for="rwRumah">RW:</label>
-                        <input type="text" id="rwRumah" inputmode="numeric" pattern="[0-9]*" placeholder="000" required>
+                        <input type="text" id="rwRumah" inputmode="numeric" pattern="[0-9]*" placeholder="022" required>
                     </div>
                 </div>
                 
@@ -61,34 +60,9 @@
         </div>
 
         <div class="card table-container">
-    <h2>Daftar Urutan Data</h2>
-<table id="tabelWarga" class="display nowrap" style="width:100%">
-            <thead>
-            <tr>
-                <th>No. Urut Bangunan</th>
-                <th>No. Urut Keluarga</th>
-                <th>Nama</th>
-                <th>Alamat</th>
-                <th style="text-align: center;">RT</th>
-                <th style="text-align: center;">RW</th>
-                <th class="no-sort">Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelBodi">
-            </tbody>
-        <tfoot>
-             <tr>
-                <th>No. Urut Bangunan</th>
-                <th>No. Urut Keluarga</th>
-                <th>Nama</th>
-                <th>Alamat</th>
-                <th style="text-align: center;">RT</th>
-                <th style="text-align: center;">RW</th>
-                <th class="no-sort">Aksi</th>
-            </tr>
-        </tfoot>
-    </table>
-</div>
+            <h2>Daftar Urutan Data per RT/RW</h2>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
